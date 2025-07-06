@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FAHDiL Market</title>
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="script.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <nav class="sidebar" id="sidebar">
+      <h2>🛒 FAHDiL Market</h2>
+      <ul>
+        <li data-page="produk" onclick="showPage('produk')">🛍️ Daftar Produk</li>
+        <li data-page="tambah" onclick="showPage('tambah')">➕ Tambah/Edit Produk</li>
+        <li data-page="keranjang" onclick="showPage('keranjang')">🛒 Keranjang</li>
+        <li data-page="checkout" onclick="showPage('checkout')">📦 Checkout</li>
+        <li data-page="riwayat" onclick="showPage('riwayat')">📜 Riwayat</li>
+        <li data-page="struk" onclick="showPage('struk')">🧾 Cetak Struk</li>
+        <li data-page="dashboard" onclick="showPage('dashboard')">📊 Dashboard Admin</li>
+        <li data-page="voucher" onclick="showPage('voucher')">🎟️ Voucher</li>
+        <li data-page="wishlist" onclick="showPage('wishlist')">❤️ Favorit</li>
+        <li data-page="pengaturan" onclick="showPage('pengaturan')">⚙️ Pengaturan</li>
+        <li data-page="login-pemilik" onclick="showPage('login-pemilik')">🔐 Login Pemilik</li>
+        <li data-page="login-owner" onclick="showPage('login-owner')">🗝️ Login Owner</li>
+        <li onclick="logout()">📤 Logout</li>
+      </ul>
+    </nav>
+
+    <header class="topbar">
+      <button id="toggleSidebar">☰</button>
+      <h1>🛍️ FAHDiL Market</h1>
+      <input type="text" id="searchInput" placeholder="🔍 Cari produk..." />
+    </header>
+
+    <main id="content">
+      <section id="produk" class="halaman">
+        <h2>🛍️ Produk Tersedia</h2>
+        <select id="filterKategori"><option value="">Semua Kategori</option></select>
+        <div id="produkContainer"></div>
+      </section>
+
+      <section id="tambah" class="halaman">
+        <h2>➕ Tambah Produk</h2>
+        <form id="formTambah">
+          <label>Nama:</label>
+          <input type="text" id="namaProduk" required />
+          <label>Harga:</label>
+          <input type="number" id="hargaProduk" required />
+          <label>Stok:</label>
+          <input type="number" id="stokProduk" required />
+          <label>Kategori:</label>
+          <input type="text" id="kategoriProduk" required />
+          <label>Gambar:</label>
+          <input type="file" id="gambarProduk" accept="image/*" />
+          <button type="submit" class="btn warna-warni">💾 Simpan</button>
+        </form>
+      </section>
+
+      <section id="keranjang" class="halaman">
+        <h2>🛒 Keranjang</h2>
+        <div id="keranjangContainer"></div>
+      </section>
+
+      <section id="checkout" class="halaman">
+        <h2>📦 Checkout</h2>
+        <button class="btn warna-warni" onclick="checkoutWA()">Kirim ke WhatsApp</button>
+        <p>Status: <span id="statusPembayaran">Belum Bayar</span></p>
+      </section>
+
+      <section id="riwayat" class="halaman">
+        <h2>📜 Riwayat</h2>
+        <div id="riwayatContainer"></div>
+      </section>
+
+      <section id="struk" class="halaman">
+        <h2>🧾 Cetak Struk</h2>
+        <button class="btn warna-warni" onclick="cetakPDF()">Cetak PDF</button>
+      </section>
+
+      <section id="dashboard" class="halaman">
+        <h2>📊 Dashboard Admin</h2>
+        <p>Jumlah Produk: <span id="jumlahProduk">0</span></p>
+      </section>
+
+      <section id="voucher" class="halaman">
+        <h2>🎟️ Voucher</h2>
+        <form id="formVoucher">
+          <label>Kode:</label>
+          <input id="kodeVoucher" required />
+          <label>Diskon (%):</label>
+          <input id="diskonVoucher" type="number" required />
+          <button type="submit" class="btn warna-warni">Simpan</button>
+        </form>
+        <div id="voucherList"></div>
+      </section>
+
+      <section id="wishlist" class="halaman">
+        <h2>❤️ Favorit</h2>
+        <div id="wishlistContainer"></div>
+      </section>
+
+      <section id="pengaturan" class="halaman">
+        <h2>⚙️ Pengaturan</h2>
+        <label>Username Baru:</label>
+        <input id="editUsername" />
+        <label>Password Baru:</label>
+        <input id="editPassword" type="password" />
+        <button onclick="editLogin()" class="btn warna-warni">Simpan Perubahan</button>
+      </section>
+
+      <section id="login-pemilik" class="halaman login-anim">
+        <h2>🔐 Login Pemilik</h2>
+        <input id="pemilikUser" placeholder="Username"/>
+        <input id="pemilikPass" type="password" placeholder="Password"/>
+        <button onclick="login('pemilik')" class="btn warna-warni">Login</button>
+      </section>
+
+      <section id="login-owner" class="halaman login-anim">
+        <h2>🗝️ Login Owner</h2>
+        <input id="ownerUser" placeholder="Username"/>
+        <input id="ownerPass" type="password" placeholder="Password"/>
+        <button onclick="login('owner')" class="btn warna-warni">Login</button>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
