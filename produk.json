@@ -1,0 +1,37 @@
+[
+  {
+    "nama": "Pulsa Telkomsel 10K",
+    "harga": 10000,
+    "stok": 50,
+    "kategori": "Pulsa",
+    "gambar": "https://via.placeholder.com/200x120.png?text=Pulsa+10K"
+  },
+  {
+    "nama": "Pulsa Indosat 20K",
+    "harga": 20000,
+    "stok": 40,
+    "kategori": "Pulsa",
+    "gambar": "https://via.placeholder.com/200x120.png?text=Pulsa+Indosat+20K"
+  },
+  {
+    "nama": "Paket Data Tri 5GB",
+    "harga": 50000,
+    "stok": 30,
+    "kategori": "Data",
+    "gambar": "https://via.placeholder.com/200x120.png?text=Paket+Data+5GB"
+  },
+  {
+    "nama": "Token PLN 20K",
+    "harga": 21000,
+    "stok": 25,
+    "kategori": "Token",
+    "gambar": "https://via.placeholder.com/200x120.png?text=Token+PLN+20K"
+  },
+  {
+    "nama": "Voucher Game ML 50 Diamond",
+    "harga": 100000,
+    "stok": 15,
+    "kategori": "Voucher",
+    "gambar": "https://via.placeholder.com/200x120.png?text=ML+50+Diamond"
+  }
+]
