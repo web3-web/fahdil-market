@@ -14,13 +14,13 @@
       <h2>🛒 FAHDiL Market</h2>
       <ul>
         <li data-page="produk" onclick="showPage('produk')">🛍️ Daftar Produk</li>
-        <li data-page="tambah" onclick="showPage('tambah')">➕ Tambah/Edit Produk</li>
+        <li data-page="tambah" onclick="showPage('tambah')">✏️ Tambah/Edit Produk</li>
         <li data-page="keranjang" onclick="showPage('keranjang')">🛒 Keranjang</li>
         <li data-page="checkout" onclick="showPage('checkout')">📦 Checkout</li>
-        <li data-page="riwayat" onclick="showPage('riwayat')">📜 Riwayat</li>
+        <li data-page="riwayat" onclick="showPage('riwayat')">📜 Riwayat Pesanan</li>
         <li data-page="struk" onclick="showPage('struk')">🧾 Cetak Struk</li>
         <li data-page="dashboard" onclick="showPage('dashboard')">📊 Dashboard Admin</li>
-        <li data-page="voucher" onclick="showPage('voucher')">🎟️ Voucher</li>
+        <li data-page="voucher" onclick="showPage('voucher')">🎟️ Kode Voucher</li>
         <li data-page="wishlist" onclick="showPage('wishlist')">❤️ Favorit</li>
         <li data-page="pengaturan" onclick="showPage('pengaturan')">⚙️ Pengaturan</li>
         <li data-page="login-pemilik" onclick="showPage('login-pemilik')">🔐 Login Pemilik</li>
@@ -35,16 +35,16 @@
       <input type="text" id="searchInput" placeholder="🔍 Cari produk...">
     </header>
 
-    <main id="content">
+    <main>
       <!-- Produk -->
-      <section id="produk" class="halaman">
+      <section id="produk" class="halaman active">
         <h2>🛍️ Produk Tersedia</h2>
         <div id="produkContainer"></div>
       </section>
 
-      <!-- Tambah/Edit Produk -->
+      <!-- Tambah Produk -->
       <section id="tambah" class="halaman">
-        <h2>➕ Tambah Produk</h2>
+        <h2>✏️ Tambah Produk</h2>
         <form id="formTambah">
           <label>Nama:</label><input type="text" id="namaProduk" required>
           <label>Harga:</label><input type="number" id="hargaProduk" required>
@@ -64,6 +64,10 @@
       <!-- Checkout -->
       <section id="checkout" class="halaman">
         <h2>📦 Checkout</h2>
+        <label>Voucher:</label>
+        <input id="applyVoucher" placeholder="Masukkan kode voucher">
+        <button class="btn warna-warni" onclick="applyVoucher()">Gunakan</button>
+        <p>Status Voucher: <span id="statusVoucher">Tidak Ada</span></p>
         <button class="btn warna-warni" onclick="checkoutWA()">Kirim ke WhatsApp</button>
       </section>
 
@@ -79,7 +83,7 @@
         <button class="btn warna-warni" onclick="cetakPDF()">Cetak PDF</button>
       </section>
 
-      <!-- Dashboard Admin -->
+      <!-- Dashboard -->
       <section id="dashboard" class="halaman">
         <h2>📊 Dashboard Admin</h2>
         <p>Jumlah Produk: <span id="jumlahProduk">0</span></p>
@@ -87,7 +91,7 @@
 
       <!-- Voucher -->
       <section id="voucher" class="halaman">
-        <h2>🎟️ Voucher</h2>
+        <h2>🎟️ Kode Voucher</h2>
         <form id="formVoucher">
           <label>Kode:</label><input id="kodeVoucher" required>
           <label>Diskon (%):</label><input id="diskonVoucher" type="number" required>
@@ -128,4 +132,4 @@
     </main>
   </div>
 </body>
-  </html>
+</html>
