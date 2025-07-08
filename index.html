@@ -13,29 +13,29 @@
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im95eXRmYW5wcmhjYXl4dGh6cmJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE4NjUxNDEsImV4cCI6MjA2NzQ0MTE0MX0.CPfeVbV2BTP5dYt42yeoxX6XxQ0ezHtFJhKHZ1cY98k'
     );
   </script>
-  <!-- Main JS -->
   <script src="script.js" defer></script>
 </head>
 <body>
   <nav id="sidebar" class="sidebar">
-  <h2>🛒 FAHDiL Market</h2>
-  <ul>
-    <li data-page="produk"        onclick="showPage('produk')">🛍️ Produk</li>
-    <li data-page="tambah"        onclick="showPage('tambah')">✏️ Tambah/Edit</li>
-    <li data-page="keranjang"     onclick="showPage('keranjang')">🛒 Keranjang</li>
-    <li data-page="checkout"      onclick="showPage('checkout')">📦 Checkout</li>
-    <li data-page="riwayat"       onclick="showPage('riwayat')">📜 Riwayat</li>
-    <li data-page="struk"         onclick="showPage('struk')">🧾 Struk</li>
-    <li data-page="dashboard"     onclick="showPage('dashboard')">📊 Dashboard</li>
-    <li data-page="voucher"       onclick="showPage('voucher')">🎟️ Voucher</li>
-    <li data-page="wishlist"      onclick="showPage('wishlist')">❤️ Favorit</li>
-    <li data-page="pengaturan"    onclick="showPage('pengaturan')">⚙️ Pengaturan</li>
-    <li data-page="login-pemilik" onclick="showPage('login-pemilik')">🔐 Login Pemilik</li>
-    <li data-page="login-owner"   onclick="showPage('login-owner')">🗝️ Login Owner</li>
-    <li onclick="logout()">📤 Logout</li>
-  </ul>
-    
-</nav>
+    <h2>🛒 FAHDiL Market</h2>
+    <ul>
+      <li data-page="produk"        onclick="showPage('produk')">🛍️ Produk</li>
+      <li data-page="tambah"        onclick="showPage('tambah')">✏️ Tambah/Edit</li>
+      <li data-page="keranjang"     onclick="showPage('keranjang')">🛒 Keranjang</li>
+      <li data-page="checkout"      onclick="showPage('checkout')">📦 Checkout</li>
+      <li data-page="riwayat"       onclick="showPage('riwayat')">📜 Riwayat</li>
+      <li data-page="struk"         onclick="showPage('struk')">🧾 Struk</li>
+      <li data-page="dashboard"     onclick="showPage('dashboard')">📊 Dashboard</li>
+      <li data-page="voucher"       onclick="showPage('voucher')">🎟️ Voucher</li>
+      <li data-page="wishlist"      onclick="showPage('wishlist')">❤️ Favorit</li>
+      <li data-page="pengaturan"    onclick="showPage('pengaturan')">⚙️ Pengaturan</li>
+      <li data-page="konfirmasi"    onclick="showPage('konfirmasi')">✅ Konfirmasi</li>
+      <li data-page="login-pemilik" onclick="showPage('login-pemilik')">🔐 Login Pemilik</li>
+      <li data-page="login-owner"   onclick="showPage('login-owner')">🗝️ Login Owner</li>
+      <li onclick="logout()">📤 Logout</li>
+    </ul>
+  </nav>
+
   <header class="topbar">
     <button id="toggleSidebar">☰</button>
     <h1>🛍️ FAHDiL Market</h1>
@@ -68,14 +68,23 @@
       <div id="keranjangContainer"></div>
     </section>
 
-    <!-- Checkout -->
+    <!-- Checkout Manual -->
     <section id="checkout" class="halaman">
-      <h2>📦 Checkout</h2>
-      <label>Voucher</label>
-      <input id="applyVoucher" type="text" placeholder="Kode voucher" />
-      <button class="btn warna-warni" onclick="applyVoucher()">Gunakan</button>
-      <p>Status Voucher: <span id="statusVoucher">Tidak Ada</span></p>
-      <button class="btn warna-warni" onclick="checkoutWA()">Kirim ke WhatsApp</button>
+      <h2>💳 Pembayaran Manual</h2>
+      <p>Total yang harus dibayar:</p>
+      <h3 id="totalBayar">Rp0</h3>
+
+      <div class="rekening-box">
+        <p><strong>Transfer ke:</strong></p>
+        <ul        
+          <li>DANA  : <span id="dana">083131810087</span> <button onclick="salin('dana')">Salin</button></li>
+          <li>OVO   : <span id="ovo">083131810087</span> <button onclick="salin('ovo')">Salin</button></li>
+          <li>GoPay : <span id="gopay">083131810087</span> <button onclick="salin('gopay')">Salin</button></li>
+        </ul>
+      </div>
+
+      <p>📩 Setelah transfer, konfirmasi pembayaran:</p>
+      <a href="#" id="waCheckout" target="_blank" class="btn warna-warni">Konfirmasi via WhatsApp</a>
     </section>
 
     <!-- Riwayat -->
@@ -120,6 +129,12 @@
       <label>Username Baru</label><input id="editUsername" type="text" /><br>
       <label>Password Baru</label><input id="editPassword" type="password" /><br>
       <button onclick="editLogin()" class="btn warna-warni">💾 Simpan</button>
+    </section>
+
+    <!-- Konfirmasi Manual (Admin Only) -->
+    <section id="konfirmasi" class="halaman">
+      <h2>✅ Konfirmasi Pembayaran</h2>
+      <div id="konfirmasiContainer"></div>
     </section>
 
     <!-- Login Pemilik -->
