@@ -35,11 +35,11 @@ const isAdmin    = () => ['pemilik','owner'].includes(userLogin);
 function updateMenu() {
   document.querySelectorAll('nav#sidebar li[data-page]').forEach(li => {
     const page = li.getAttribute('data-page');
+    // hanya tampilkan halaman admin kalau sudah login admin
     if (adminPages.includes(page)) {
-      // show only for admin
       li.style.display = isAdmin() ? 'block' : 'none';
     }
-    // hide login links once logged in
+    // sembunyikan link login kalau sudah login
     if (page === 'login-pemilik' || page === 'login-owner') {
       li.style.display = isAdmin() ? 'none' : 'block';
     }
@@ -54,15 +54,14 @@ document.querySelectorAll('nav#sidebar li[data-page]').forEach(li =>
 
 // ----- Page Navigation with Admin Guard -----
 window.showPage = id => {
-  // guard admin pages
+  // guard: jika halaman admin tapi belum login admin
   if (adminPages.includes(id) && !isAdmin()) {
     alert('Silakan login sebagai Pemilik/Owner terlebih dahulu.');
     id = 'login-pemilik';
   }
-
+  // render halaman
   document.querySelectorAll('.halaman').forEach(s => s.classList.remove('active'));
   document.getElementById(id)?.classList.add('active');
-
   if (id === 'produk') loadProduk();
 };
 
@@ -107,8 +106,7 @@ async function loadProduk() {
       <button onclick="tambahWishlist(${p.id})" class="btn warna-warni">❤️</button>
     </div>
   `).join('');
-  // reapply search filter
-  searchInput.dispatchEvent(new Event('input'));
+  searchInput.dispatchEvent(new Event('input')); // reapply search filter
 }
 loadProduk();
 
@@ -249,5 +247,6 @@ searchInput.addEventListener('input', () => {
   });
 });
 
-// ----- Initialize menu visibility -----
+// ----- Initialize menu visibility & default page -----
 updateMenu();
+showPage('produk');
