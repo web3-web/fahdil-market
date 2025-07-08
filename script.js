@@ -1,71 +1,69 @@
 // File: script.js (loaded with defer, after DOM ready)
 
-// Supabase client
+// — Supabase client
 const SUPA = window.SUPA;
 
-// Init localStorage keys
+// — Inisialisasi localStorage keys
 ['keranjang','wishlist','riwayat','vouchers'].forEach(k => {
   if (localStorage.getItem(k) === null) localStorage.setItem(k, '[]');
 });
 
-// State
+// — State global
 let keranjang = JSON.parse(localStorage.getItem('keranjang'));
 let wishlist  = JSON.parse(localStorage.getItem('wishlist'));
 let riwayat   = JSON.parse(localStorage.getItem('riwayat'));
 let vouchers  = JSON.parse(localStorage.getItem('vouchers'));
 
 const loginData = {
-  pemilik: { user: 'FAHDiL', pass: 'WEB_ADMIN_123' },
-  owner:   { user: 'OWNERKU', pass: 'OWNER_PASS' }
+  pemilik: { user: 'FAHDiL',      pass: 'WEB_ADMIN_123' },
+  owner:   { user: 'OWNERKU',     pass: 'OWNER_PASS' }
 };
 let userLogin   = null;
 let appliedDisc = 0;
 
-// DOM elements
+// — DOM references
 const sidebar         = document.getElementById('sidebar');
 const toggleSidebar   = document.getElementById('toggleSidebar');
 const searchInput     = document.getElementById('searchInput');
 const produkContainer = document.getElementById('produkContainer');
 
-// Admin pages list & helper
+// — Daftar halaman khusus admin
 const adminPages = ['tambah','voucher','dashboard','pengaturan','struk'];
 const isAdmin    = () => ['pemilik','owner'].includes(userLogin);
 
-// ----- Update Sidebar Menu Visibility -----
+// — Fungsi untuk show/hide menu di sidebar
 function updateMenu() {
   document.querySelectorAll('nav#sidebar li[data-page]').forEach(li => {
     const page = li.getAttribute('data-page');
-    // hanya tampilkan halaman admin kalau sudah login admin
     if (adminPages.includes(page)) {
+      // sembunyikan halaman admin untuk non-admin
       li.style.display = isAdmin() ? 'block' : 'none';
     }
-    // sembunyikan link login kalau sudah login
+    // sembunyikan login links jika sudah login
     if (page === 'login-pemilik' || page === 'login-owner') {
       li.style.display = isAdmin() ? 'none' : 'block';
     }
   });
 }
 
-// Sidebar toggle & autoclose
+// — Toggle & autoclose sidebar
 toggleSidebar.addEventListener('click', () => sidebar.classList.toggle('active'));
 document.querySelectorAll('nav#sidebar li[data-page]').forEach(li =>
   li.addEventListener('click', () => sidebar.classList.remove('active'))
 );
 
-// ----- Page Navigation with Admin Guard -----
+// — Fungsi navigasi halaman dengan guard admin
 window.showPage = id => {
-  // guard: jika halaman admin tapi belum login admin
   if (adminPages.includes(id) && !isAdmin()) {
     alert('Silakan login sebagai Pemilik/Owner terlebih dahulu.');
     id = 'login-pemilik';
   }
-  // render halaman
   document.querySelectorAll('.halaman').forEach(s => s.classList.remove('active'));
   document.getElementById(id)?.classList.add('active');
   if (id === 'produk') loadProduk();
 };
 
-// ----- Login / Logout -----
+// — Login & Logout
 window.login = role => {
   const u = document.getElementById(role + 'User').value;
   const p = document.getElementById(role + 'Pass').value;
@@ -88,10 +86,10 @@ window.logout = () => {
   showPage('produk');
 };
 
-// ----- Load & Render Products -----
+// — Load & render produk dari Supabase
 async function loadProduk() {
   produkContainer.innerHTML = '⏳ Memuat produk...';
-  const { data, error } = await SUPA.from('produk').select('*').order('id',{ascending:false});
+  const { data, error } = await SUPA.from('produk').select('*').order('id', { ascending: false });
   if (error) {
     produkContainer.innerHTML = '<p>⚠️ Gagal memuat produk</p>';
     return;
@@ -106,11 +104,11 @@ async function loadProduk() {
       <button onclick="tambahWishlist(${p.id})" class="btn warna-warni">❤️</button>
     </div>
   `).join('');
-  searchInput.dispatchEvent(new Event('input')); // reapply search filter
+  searchInput.dispatchEvent(new Event('input'));
 }
 loadProduk();
 
-// ----- Prepare Edit Product -----
+// — Prepare edit produk
 window.prepareEdit = async id => {
   const { data: p } = await SUPA.from('produk').select('*').eq('id', id).single();
   document.getElementById('namaProduk').value     = p.nama;
@@ -133,7 +131,7 @@ window.prepareEdit = async id => {
   };
 };
 
-// ----- Submit New Product -----
+// — Submit produk baru
 function submitForm(e) {
   e.preventDefault();
   const nama     = document.getElementById('namaProduk').value;
@@ -152,7 +150,7 @@ function submitForm(e) {
 }
 document.getElementById('formTambah').addEventListener('submit', submitForm);
 
-// ----- Keranjang -----
+// — Keranjang
 window.tambahKeranjang = async id => {
   const { data: p } = await SUPA.from('produk').select('*').eq('id', id).single();
   keranjang.push(p);
@@ -164,7 +162,7 @@ function renderKeranjang() {
     keranjang.map(p => `<div>${p.nama} - Rp${p.harga}</div>`).join('');
 }
 
-// ----- Wishlist -----
+// — Wishlist
 window.tambahWishlist = async id => {
   const { data: p } = await SUPA.from('produk').select('*').eq('id', id).single();
   wishlist.push(p);
@@ -176,13 +174,13 @@ function renderWishlist() {
     wishlist.map(p => `<div>${p.nama}</div>`).join('');
 }
 
-// ----- Riwayat -----
+// — Riwayat
 function renderRiwayat() {
   document.getElementById('riwayatContainer').innerHTML =
     riwayat.map(p => `<div>${p.nama} - Rp${p.harga}</div>`).join('');
 }
 
-// ----- Voucher -----
+// — Voucher
 window.renderVoucher = () => {
   document.getElementById('voucherList').innerHTML =
     vouchers.map(v => `<div>${v.kode} — ${v.diskon}%</div>`).join('');
@@ -204,7 +202,7 @@ window.applyVoucher = () => {
   alert('Voucher diterapkan');
 };
 
-// ----- Checkout & Cetak -----
+// — Checkout & Cetak
 window.checkoutWA = () => {
   let cart = [...keranjang];
   if (appliedDisc) cart = cart.map(p => ({ ...p, harga: Math.round(p.harga * (100 - appliedDisc)/100) }));
@@ -212,7 +210,7 @@ window.checkoutWA = () => {
   window.open(`https://wa.me/6283131810087?text=${encodeURIComponent(teks)}`);
   riwayat.push(...cart);
   localStorage.setItem('riwayat', JSON.stringify(riwayat));
-  keranjang = []; localStorage.setItem('keranjang', '[]');
+  keranjang = []; localStorage.setItem('keranjang','[]');
   renderKeranjang(); appliedDisc = 0;
 };
 window.cetakPDF = (() => {
@@ -224,10 +222,10 @@ window.cetakPDF = (() => {
   };
 })();
 
-// ----- Dashboard & Pengaturan -----
+// — Dashboard & Pengaturan
 function updateDashboard() {
   document.getElementById('jumlahProduk').textContent = produkContainer.children.length;
-  const total = riwayat.reduce((a, p) => a + p.harga, 0);
+  const total = riwayat.reduce((a,p) => a + p.harga, 0);
   document.getElementById('totalOmzet').textContent = `Rp${total}`;
 }
 window.editLogin = () => {
@@ -239,7 +237,7 @@ window.editLogin = () => {
   alert('Login diperbarui');
 };
 
-// ----- Search Filter -----
+// — Search filter
 searchInput.addEventListener('input', () => {
   const q = searchInput.value.toLowerCase();
   document.querySelectorAll('.produk-card').forEach(c => {
@@ -247,6 +245,6 @@ searchInput.addEventListener('input', () => {
   });
 });
 
-// ----- Initialize menu visibility & default page -----
+// — Inisialisasi menu & halaman default
 updateMenu();
 showPage('produk');
