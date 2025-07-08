@@ -4,7 +4,7 @@
 const SUPA = window.SUPA;
 
 // Init localStorage keys
-['keranjang','wishlist','riwayat','vouchers'].forEach(k=>{
+['keranjang','wishlist','riwayat','vouchers'].forEach(k => {
   if (localStorage.getItem(k) === null) localStorage.setItem(k, '[]');
 });
 
@@ -22,44 +22,67 @@ let userLogin = null;
 let appliedDisc = 0;
 
 // DOM elements
-const sidebar        = document.getElementById('sidebar');
-const toggleSidebar  = document.getElementById('toggleSidebar');
-const searchInput    = document.getElementById('searchInput');
+const sidebar         = document.getElementById('sidebar');
+const toggleSidebar   = document.getElementById('toggleSidebar');
+const searchInput     = document.getElementById('searchInput');
 const produkContainer = document.getElementById('produkContainer');
-const adminPages     = ['tambah','voucher','dashboard','pengaturan','struk'];
-const isAdmin        = () => ['pemilik','owner'].includes(userLogin);
+
+// Admin pages list & helper
+const adminPages = ['tambah','voucher','dashboard','pengaturan','struk'];
+const isAdmin    = () => ['pemilik','owner'].includes(userLogin);
+
+// ----- Update Sidebar Menu Visibility -----
+function updateMenu() {
+  document.querySelectorAll('nav#sidebar li[data-page]').forEach(li => {
+    const page = li.getAttribute('data-page');
+    // show admin pages only for admin
+    if (adminPages.includes(page)) {
+      li.style.display = isAdmin() ? 'block' : 'none';
+    }
+    // hide login links when logged in
+    if (page === 'login-pemilik' || page === 'login-owner') {
+      li.style.display = isAdmin() ? 'none' : 'block';
+    }
+  });
+}
 
 // Sidebar toggle & autoclose
 toggleSidebar.addEventListener('click', () => sidebar.classList.toggle('active'));
-document.querySelectorAll('.sidebar li[data-page]').forEach(li =>
+document.querySelectorAll('nav#sidebar li[data-page]').forEach(li =>
   li.addEventListener('click', () => sidebar.classList.remove('active'))
 );
 
-// Navigate pages
+// ----- Page Navigation -----
 window.showPage = id => {
   document.querySelectorAll('.halaman').forEach(s => s.classList.remove('active'));
   document.getElementById(id)?.classList.add('active');
   if (id === 'produk') loadProduk();
 };
 
-// Login / Logout
+// ----- Login / Logout -----
 window.login = role => {
   const u = document.getElementById(role + 'User').value;
   const p = document.getElementById(role + 'Pass').value;
   if (loginData[role] && u === loginData[role].user && p === loginData[role].pass) {
     userLogin = role;
     alert('Login berhasil sebagai ' + role);
+    updateMenu();
     showPage('dashboard');
     updateDashboard();
-  } else alert('Login gagal');
+  } else {
+    alert('Login gagal');
+  }
 };
+
 window.logout = () => {
   userLogin = null;
+  appliedDisc = 0;
   alert('Logout berhasil');
+  updateMenu();
   showPage('produk');
 };
 
-// Load & render products
+// ----- Load & Render Products -----
 async function loadProduk() {
   produkContainer.innerHTML = '⏳ Memuat produk...';
   const { data, error } = await SUPA.from('produk').select('*').order('id',{ascending:false});
@@ -77,14 +100,13 @@ async function loadProduk() {
       <button onclick="tambahWishlist(${p.id})" class="btn warna-warni">❤️</button>
     </div>
   `).join('');
-  // apply search filter
-  searchInput.dispatchEvent(new Event('input'));
+  searchInput.dispatchEvent(new Event('input')); // reapply search filter
 }
 loadProduk();
 
-// Prepare edit product
+// ----- Prepare Edit Product -----
 window.prepareEdit = async id => {
-  const { data: p } = await SUPA.from('produk').select('*').eq('id',id).single();
+  const { data: p } = await SUPA.from('produk').select('*').eq('id', id).single();
   document.getElementById('namaProduk').value = p.nama;
   document.getElementById('hargaProduk').value = p.harga;
   document.getElementById('stokProduk').value = p.stok;
@@ -94,10 +116,10 @@ window.prepareEdit = async id => {
     e.preventDefault();
     await SUPA.from('produk').update({
       nama: document.getElementById('namaProduk').value,
-      harga:+document.getElementById('hargaProduk').value,
-      stok:+document.getElementById('stokProduk').value,
+      harga: +document.getElementById('hargaProduk').value,
+      stok: +document.getElementById('stokProduk').value,
       kategori: document.getElementById('kategoriProduk').value
-    }).eq('id',id);
+    }).eq('id', id);
     alert('Produk diperbarui');
     loadProduk();
     showPage('produk');
@@ -105,17 +127,17 @@ window.prepareEdit = async id => {
   };
 };
 
-// Submit new product
+// ----- Submit New Product -----
 function submitForm(e) {
   e.preventDefault();
-  const nama = document.getElementById('namaProduk').value;
-  const harga= +document.getElementById('hargaProduk').value;
-  const stok = +document.getElementById('stokProduk').value;
+  const nama     = document.getElementById('namaProduk').value;
+  const harga    = +document.getElementById('hargaProduk').value;
+  const stok     = +document.getElementById('stokProduk').value;
   const kategori = document.getElementById('kategoriProduk').value;
-  const file = document.getElementById('gambarProduk').files[0];
-  const reader = new FileReader();
+  const file     = document.getElementById('gambarProduk').files[0];
+  const reader   = new FileReader();
   reader.onload = async () => {
-    await SUPA.from('produk').insert([{ nama,harga,stok,kategori,gambar:reader.result }]);
+    await SUPA.from('produk').insert([{ nama, harga, stok, kategori, gambar: reader.result }]);
     alert('Produk disimpan');
     loadProduk();
     showPage('produk');
@@ -125,96 +147,100 @@ function submitForm(e) {
 const formTambah = document.getElementById('formTambah');
 formTambah.addEventListener('submit', submitForm);
 
-// Keranjang
+// ----- Keranjang -----
 window.tambahKeranjang = async id => {
-  const { data: p } = await SUPA.from('produk').select('*').eq('id',id).single();
+  const { data: p } = await SUPA.from('produk').select('*').eq('id', id).single();
   keranjang.push(p);
   localStorage.setItem('keranjang', JSON.stringify(keranjang));
   renderKeranjang();
 };
 function renderKeranjang() {
   document.getElementById('keranjangContainer').innerHTML =
-    keranjang.map(p=>`<div>${p.nama} - Rp${p.harga}</div>`).join('');
+    keranjang.map(p => `<div>${p.nama} - Rp${p.harga}</div>`).join('');
 }
 
-// Wishlist
+// ----- Wishlist -----
 window.tambahWishlist = async id => {
-  const { data: p } = await SUPA.from('produk').select('*').eq('id',id).single();
+  const { data: p } = await SUPA.from('produk').select('*').eq('id', id).single();
   wishlist.push(p);
   localStorage.setItem('wishlist', JSON.stringify(wishlist));
   renderWishlist();
 };
 function renderWishlist() {
   document.getElementById('wishlistContainer').innerHTML =
-    wishlist.map(p=>`<div>${p.nama}</div>`).join('');
+    wishlist.map(p => `<div>${p.nama}</div>`).join('');
 }
 
-// Riwayat
+// ----- Riwayat -----
 function renderRiwayat() {
   document.getElementById('riwayatContainer').innerHTML =
-    riwayat.map(p=>`<div>${p.nama} - Rp${p.harga}</div>`).join('');
+    riwayat.map(p => `<div>${p.nama} - Rp${p.harga}</div>`).join('');
 }
 
-// Voucher
+// ----- Voucher -----
 window.renderVoucher = () => {
   document.getElementById('voucherList').innerHTML =
-    vouchers.map(v=>`<div>${v.kode} — ${v.diskon}%</div>`).join('');
+    vouchers.map(v => `<div>${v.kode} — ${v.diskon}%</div>`).join('');
 };
 document.getElementById('formVoucher').addEventListener('submit', e => {
   e.preventDefault();
-  const kode=document.getElementById('kodeVoucher').value;
-  const diskon=+document.getElementById('diskonVoucher').value;
-  vouchers.push({ kode,diskon });
+  const kode   = document.getElementById('kodeVoucher').value;
+  const diskon = +document.getElementById('diskonVoucher').value;
+  vouchers.push({ kode, diskon });
   localStorage.setItem('vouchers', JSON.stringify(vouchers));
   renderVoucher();
 });
 window.applyVoucher = () => {
-  const code=document.getElementById('applyVoucher').value.trim();
-  const v=vouchers.find(x=>x.kode===code);
+  const code = document.getElementById('applyVoucher').value.trim();
+  const v    = vouchers.find(x => x.kode === code);
   if (!v) return alert('Voucher tidak ditemukan');
-  appliedDisc=v.diskon;
-  document.getElementById('statusVoucher').textContent=`Diskon ${v.diskon}%`;
+  appliedDisc = v.diskon;
+  document.getElementById('statusVoucher').textContent = `Diskon ${v.diskon}%`;
   alert('Voucher diterapkan');
 };
 
-// Checkout & Cetak
+// ----- Checkout & Cetak -----
 window.checkoutWA = () => {
-  let cart=[...keranjang];
-  if(appliedDisc) cart=cart.map(p=>({...p,harga:Math.round(p.harga*(100-appliedDisc)/100)}));
-  const teks=cart.map(p=>`${p.nama} - Rp${p.harga}`).join('\n');
+  let cart = [...keranjang];
+  if (appliedDisc) cart = cart.map(p => ({ ...p, harga: Math.round(p.harga * (100 - appliedDisc)/100) }));
+  const teks = cart.map(p => `${p.nama} - Rp${p.harga}`).join('\n');
   window.open(`https://wa.me/6283131810087?text=${encodeURIComponent(teks)}`);
   riwayat.push(...cart);
   localStorage.setItem('riwayat', JSON.stringify(riwayat));
-  keranjang=[]; localStorage.setItem('keranjang','[]');
-  renderKeranjang(); appliedDisc=0;
+  keranjang = []; localStorage.setItem('keranjang', '[]');
+  renderKeranjang(); appliedDisc = 0;
 };
-
 window.cetakPDF = (() => {
   const { jsPDF } = window.jspdf;
   return () => {
     const doc = new jsPDF();
-    keranjang.forEach((p,i)=>doc.text(`${p.nama} - Rp${p.harga}`,10,10+i*10));
+    keranjang.forEach((p, i) => doc.text(`${p.nama} - Rp${p.harga}`, 10, 10 + i*10));
     doc.save('struk.pdf');
   };
 })();
 
-// Dashboard & Pengaturan
+// ----- Dashboard & Pengaturan -----
 function updateDashboard() {
   document.getElementById('jumlahProduk').textContent = produkContainer.children.length;
-  const total=riwayat.reduce((a,p)=>a+p.harga,0);
-  document.getElementById('totalOmzet').textContent=`Rp${total}`;
+  const total = riwayat.reduce((a, p) => a + p.harga, 0);
+  document.getElementById('totalOmzet').textContent = `Rp${total}`;
 }
 window.editLogin = () => {
-  if(!userLogin) return alert('Login dulu');
-  loginData[userLogin]={user:document.getElementById('editUsername').value,
-                       pass:document.getElementById('editPassword').value};
+  if (!userLogin) return alert('Login dulu');
+  loginData[userLogin] = {
+    user: document.getElementById('editUsername').value,
+    pass: document.getElementById('editPassword').value
+  };
   alert('Login diperbarui');
 };
 
-// Search filter
+// ----- Search Filter -----
 searchInput.addEventListener('input', () => {
-  const q=searchInput.value.toLowerCase();
-  document.querySelectorAll('.produk-card').forEach(c=>{
-    c.style.display=c.querySelector('h3').textContent.toLowerCase().includes(q)?'block':'none';
+  const q = searchInput.value.toLowerCase();
+  document.querySelectorAll('.produk-card').forEach(c => {
+    c.style.display = c.querySelector('h3').textContent.toLowerCase().includes(q) ? 'block' : 'none';
   });
 });
+
+// ----- Initialize menu visibility -----
+updateMenu();
