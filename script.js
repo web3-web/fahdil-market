@@ -1,104 +1,220 @@
-// File: script.js – Final dengan Admin Guard & Voucher
-(function(){
-  document.addEventListener('DOMContentLoaded',()=>{
-    // Storage fallback
-    let storage;
-    try { storage=localStorage;}catch{storage={_d:{},getItem(k){return this._d[k]||null},setItem(k,v){this._d[k]=v}}}
-    const load=(k,def)=>{try{const v=storage.getItem(k);return v?JSON.parse(v):def}catch{return def}},
-          save=(k,v)=>{try{storage.setItem(k,JSON.stringify(v))}catch{}}
+// File: script.js (loaded with defer, after DOM ready)
 
-    // Data
-    let jsonProduk=[], localProduk=load('localProduk',[]), keranjang=load('keranjang',[]),
-        wishlist=load('wishlist',[]), riwayat=load('riwayat',[]), vouchers=load('vouchers',[]),
-        loginData=load('loginData',{pemilik:{user:'FAHDiL',pass:'WEB ADMIN GANTENG.1'},owner:{user:'OWNERKU',pass:'OWNER MASUK 1'}}),
-        userLogin=null, appliedDisc=0;
-    const sidebar=document.getElementById('sidebar');
+// Supabase client
+const SUPA = window.SUPA;
 
-    // Fetch JSON
-    fetch('data/produk.json').then(r=>r.json()).then(d=>{jsonProduk=d;renderProduk();updateDashboard();}).catch(console.error);
+// Init localStorage keys
+['keranjang','wishlist','riwayat','vouchers'].forEach(k=>{
+  if (localStorage.getItem(k) === null) localStorage.setItem(k, '[]');
+});
 
-    // Sidebar toggle
-    document.getElementById('toggleSidebar')?.addEventListener('click',()=>sidebar.classList.toggle('active'));    
-    // Autoclose
-    document.querySelectorAll('nav.sidebar li[data-page]').forEach(li=>li.addEventListener('click',()=>sidebar.classList.remove('active')));
+// State
+let keranjang = JSON.parse(localStorage.getItem('keranjang'));
+let wishlist  = JSON.parse(localStorage.getItem('wishlist'));
+let riwayat   = JSON.parse(localStorage.getItem('riwayat'));
+let vouchers  = JSON.parse(localStorage.getItem('vouchers'));
 
-    // Guard
-    const adminPages=['tambah','voucher','dashboard','pengaturan','struk'], isAdmin=()=>userLogin==='pemilik'||userLogin==='owner';
-    const updateMenu=()=>{
-      document.querySelectorAll('nav.sidebar li[data-page]').forEach(li=>{
-        const p=li.getAttribute('data-page');
-        if(adminPages.includes(p)) li.style.display=isAdmin()?'block':'none';
-        if(p==='login-pemilik'||p==='login-owner') li.style.display=isAdmin()?'none':'block';
-      });
-    };
-    updateMenu();
+const loginData = {
+  pemilik: { user: 'FAHDiL', pass: 'WEB_ADMIN_123' },
+  owner:   { user: 'OWNERKU', pass: 'OWNER_PASS' }
+};
+let userLogin = null;
+let appliedDisc = 0;
 
-    // showPage
-    window.showPage=id=>{if(adminPages.includes(id)&&!isAdmin())return showPage('login-pemilik');
-      document.querySelectorAll('.halaman').forEach(s=>s.classList.remove('active'));
-      document.getElementById(id)?.classList.add('active');
-      sidebar.classList.remove('active');
-      if(id==='produk')renderProduk();if(id==='keranjang')renderKeranjang();
-      if(id==='wishlist')renderWishlist();if(id==='riwayat')renderRiwayat();
-      if(id==='voucher')renderVoucher();if(id==='dashboard')updateDashboard();
-    };
+// DOM elements
+const sidebar        = document.getElementById('sidebar');
+const toggleSidebar  = document.getElementById('toggleSidebar');
+const searchInput    = document.getElementById('searchInput');
+const produkContainer = document.getElementById('produkContainer');
+const adminPages     = ['tambah','voucher','dashboard','pengaturan','struk'];
+const isAdmin        = () => ['pemilik','owner'].includes(userLogin);
 
-    // login/logout
-    window.login=role=>{const u=document.getElementById(role+'User').value,p=document.getElementById(role+'Pass').value;
-      if(loginData[role]&&u===loginData[role].user&&p===loginData[role].pass){userLogin=role;save('loginData',loginData);
-        alert('Login '+role+' berhasil');updateMenu();showPage('dashboard');}else alert('Login gagal');};
-    window.logout=()=>{userLogin=null;appliedDisc=0;document.getElementById('statusVoucher').textContent='Tidak Ada';
-      alert('Logout berhasil');updateMenu();showPage('produk');};
+// Sidebar toggle & autoclose
+toggleSidebar.addEventListener('click', () => sidebar.classList.toggle('active'));
+document.querySelectorAll('.sidebar li[data-page]').forEach(li =>
+  li.addEventListener('click', () => sidebar.classList.remove('active'))
+);
 
-    // renderProduk
-    window.renderProduk=()=>{const c=document.getElementById('produkContainer');if(!c)return;c.innerHTML='';
-      [...localProduk,...jsonProduk].forEach((p,i)=>{const d=document.createElement('div');d.className='produk-card';
-        d.innerHTML=`<img src="${p.gambar}"/><h3>${p.nama}</h3><p>Rp${p.harga}</p><p>Stok:${p.stok}</p>
-          <button onclick="tambahKeranjang(${i})">🛒</button><button onclick="tambahWishlist(${i})">❤️</button>
-          ${isAdmin()?`<button onclick="editProduk(${i})">✏️</button>`:''}`;
-        c.appendChild(d);
-      });
-    };
+// Navigate pages
+window.showPage = id => {
+  document.querySelectorAll('.halaman').forEach(s => s.classList.remove('active'));
+  document.getElementById(id)?.classList.add('active');
+  if (id === 'produk') loadProduk();
+};
 
-    // formTambah
-    document.getElementById('formTambah')?.addEventListener('submit',e=>{e.preventDefault();
-      const n=document.getElementById('namaProduk').value,h=+document.getElementById('hargaProduk').value,s=+document.getElementById('stokProduk').value,k=document.getElementById('kategoriProduk').value,f=document.getElementById('gambarProduk').files[0];
-      if(!n||!f)return alert('Nama & gambar wajib');const r=new FileReader();r.onload=()=>{localProduk.push({nama:n,harga:h,stok:s,kategori:k,gambar:r.result});save('localProduk',localProduk);
-        alert('Produk ditambahkan');renderProduk();showPage('produk');};r.readAsDataURL(f);
-    });
+// Login / Logout
+window.login = role => {
+  const u = document.getElementById(role + 'User').value;
+  const p = document.getElementById(role + 'Pass').value;
+  if (loginData[role] && u === loginData[role].user && p === loginData[role].pass) {
+    userLogin = role;
+    alert('Login berhasil sebagai ' + role);
+    showPage('dashboard');
+    updateDashboard();
+  } else alert('Login gagal');
+};
+window.logout = () => {
+  userLogin = null;
+  alert('Logout berhasil');
+  showPage('produk');
+};
 
-    window.editProduk=i=>{if(i>=localProduk.length)return alert('Hanya produk lokal');const p=localProduk[i];
-      ['namaProduk','hargaProduk','stokProduk','kategoriProduk'].forEach(id=>document.getElementById(id).value=p[id.replace('Produk','').toLowerCase()]);
-      localProduk.splice(i,1);save('localProduk',localProduk);showPage('tambah');};
+// Load & render products
+async function loadProduk() {
+  produkContainer.innerHTML = '⏳ Memuat produk...';
+  const { data, error } = await SUPA.from('produk').select('*').order('id',{ascending:false});
+  if (error) {
+    produkContainer.innerHTML = '<p>⚠️ Gagal memuat produk</p>';
+    return;
+  }
+  produkContainer.innerHTML = data.map(p => `
+    <div class="produk-card">
+      <img src="${p.gambar}" alt="${p.nama}">
+      <h3>${p.nama}</h3>
+      <p>Rp${p.harga}</p>
+      ${isAdmin() ? `<button onclick="prepareEdit(${p.id})" class="btn warna-warni">✏️ Edit</button>` : ''}
+      <button onclick="tambahKeranjang(${p.id})" class="btn warna-warni">🛒 Beli</button>
+      <button onclick="tambahWishlist(${p.id})" class="btn warna-warni">❤️</button>
+    </div>
+  `).join('');
+  // apply search filter
+  searchInput.dispatchEvent(new Event('input'));
+}
+loadProduk();
 
-    // cart,wishlist,riwayat
-    window.tambahKeranjang=i=>{const p=[...localProduk,...jsonProduk][i];keranjang.push(p);save('keranjang',keranjang);alert('Keranjang');};
-    window.renderKeranjang=()=>document.getElementById('keranjangContainer').innerHTML=keranjang.map(p=>`<div>${p.nama} - Rp${p.harga}</div>`).join('');
-    window.tambahWishlist=i=>{const p=[...localProduk,...jsonProduk][i];wishlist.push(p);save('wishlist',wishlist);alert('Favorit');};
-    window.renderWishlist=()=>document.getElementById('wishlistContainer').innerHTML=wishlist.map(p=>`<div>${p.nama}</div>`).join('');
-    window.renderRiwayat=()=>document.getElementById('riwayatContainer').innerHTML=riwayat.map(p=>`<div>${p.nama} - Rp${p.harga}</div>`).join('');
+// Prepare edit product
+window.prepareEdit = async id => {
+  const { data: p } = await SUPA.from('produk').select('*').eq('id',id).single();
+  document.getElementById('namaProduk').value = p.nama;
+  document.getElementById('hargaProduk').value = p.harga;
+  document.getElementById('stokProduk').value = p.stok;
+  document.getElementById('kategoriProduk').value = p.kategori;
+  showPage('tambah');
+  document.getElementById('formTambah').onsubmit = async e => {
+    e.preventDefault();
+    await SUPA.from('produk').update({
+      nama: document.getElementById('namaProduk').value,
+      harga:+document.getElementById('hargaProduk').value,
+      stok:+document.getElementById('stokProduk').value,
+      kategori: document.getElementById('kategoriProduk').value
+    }).eq('id',id);
+    alert('Produk diperbarui');
+    loadProduk();
+    showPage('produk');
+    document.getElementById('formTambah').onsubmit = submitForm;
+  };
+};
 
-    // voucher apply
-    window.applyVoucher=()=>{const code=document.getElementById('applyVoucher').value.trim();const v=vouchers.find(x=>x.kode===code);
-      if(!v)return alert('Voucher tidak ditemukan');appliedDisc=v.diskon;document.getElementById('statusVoucher').textContent=`Kode ${code} — Diskon ${v.diskon}%`;alert('Voucher diterapkan');};
+// Submit new product
+function submitForm(e) {
+  e.preventDefault();
+  const nama = document.getElementById('namaProduk').value;
+  const harga= +document.getElementById('hargaProduk').value;
+  const stok = +document.getElementById('stokProduk').value;
+  const kategori = document.getElementById('kategoriProduk').value;
+  const file = document.getElementById('gambarProduk').files[0];
+  const reader = new FileReader();
+  reader.onload = async () => {
+    await SUPA.from('produk').insert([{ nama,harga,stok,kategori,gambar:reader.result }]);
+    alert('Produk disimpan');
+    loadProduk();
+    showPage('produk');
+  };
+  if (file) reader.readAsDataURL(file);
+}
+const formTambah = document.getElementById('formTambah');
+formTambah.addEventListener('submit', submitForm);
 
-    // checkout
-    window.checkoutWA=()=>{let cart=[...keranjang];if(appliedDisc)cart=cart.map(p=>({...p,harga:Math.round(p.harga*(100-appliedDisc)/100)}));const txt=cart.map(p=>`${p.nama} - Rp${p.harga}`).join('\n');window.open(`https://wa.me/6283131810087?text=${encodeURIComponent(txt)}`);
-      riwayat.push(...cart);save('riwayat',riwayat);keranjang=[];save('keranjang',keranjang);renderKeranjang();appliedDisc=0;document.getElementById('statusVoucher').textContent='Tidak Ada';};
-    window.cetakPDF=()=>{const doc=new window.jspdf.jsPDF();keranjang.forEach((p,i)=>doc.text(`${p.nama} - Rp${p.harga}`,10,10+i*10));doc.save('struk.pdf');};
+// Keranjang
+window.tambahKeranjang = async id => {
+  const { data: p } = await SUPA.from('produk').select('*').eq('id',id).single();
+  keranjang.push(p);
+  localStorage.setItem('keranjang', JSON.stringify(keranjang));
+  renderKeranjang();
+};
+function renderKeranjang() {
+  document.getElementById('keranjangContainer').innerHTML =
+    keranjang.map(p=>`<div>${p.nama} - Rp${p.harga}</div>`).join('');
+}
 
-    // voucher render
-    window.renderVoucher=()=>document.getElementById('voucherList').innerHTML=vouchers.map(v=>`<div>${v.kode} — ${v.diskon}%</div>`).join('');
-    document.getElementById('formVoucher')?.addEventListener('submit',e=>{e.preventDefault();const k=document.getElementById('kodeVoucher').value;const d=+document.getElementById('diskonVoucher').value;vouchers.push({kode:k,diskon:d});save('vouchers',vouchers);renderVoucher();});
+// Wishlist
+window.tambahWishlist = async id => {
+  const { data: p } = await SUPA.from('produk').select('*').eq('id',id).single();
+  wishlist.push(p);
+  localStorage.setItem('wishlist', JSON.stringify(wishlist));
+  renderWishlist();
+};
+function renderWishlist() {
+  document.getElementById('wishlistContainer').innerHTML =
+    wishlist.map(p=>`<div>${p.nama}</div>`).join('');
+}
 
-    // dashboard & editLogin
-    window.updateDashboard=()=>document.getElementById('jumlahProduk').textContent=localProduk.length+jsonProduk.length;
-    window.editLogin=()=>{if(!userLogin)return alert('Login dulu');const u=document.getElementById('editUsername').value,p=document.getElementById('editPassword').value;if(!u||!p)return alert('Isi username & password baru');loginData[userLogin]={user:u,pass:p};save('loginData',loginData);alert('Login diperbarui');};
+// Riwayat
+function renderRiwayat() {
+  document.getElementById('riwayatContainer').innerHTML =
+    riwayat.map(p=>`<div>${p.nama} - Rp${p.harga}</div>`).join('');
+}
 
-    // search
-    document.getElementById('searchInput')?.addEventListener('input',e=>{const q=e.target.value.toLowerCase();document.querySelectorAll('.produk-card').forEach(c=>{const t=c.querySelector('h3')?.textContent.toLowerCase();c.style.display=t&&t.includes(q)?'block':'none';});});
+// Voucher
+window.renderVoucher = () => {
+  document.getElementById('voucherList').innerHTML =
+    vouchers.map(v=>`<div>${v.kode} — ${v.diskon}%</div>`).join('');
+};
+document.getElementById('formVoucher').addEventListener('submit', e => {
+  e.preventDefault();
+  const kode=document.getElementById('kodeVoucher').value;
+  const diskon=+document.getElementById('diskonVoucher').value;
+  vouchers.push({ kode,diskon });
+  localStorage.setItem('vouchers', JSON.stringify(vouchers));
+  renderVoucher();
+});
+window.applyVoucher = () => {
+  const code=document.getElementById('applyVoucher').value.trim();
+  const v=vouchers.find(x=>x.kode===code);
+  if (!v) return alert('Voucher tidak ditemukan');
+  appliedDisc=v.diskon;
+  document.getElementById('statusVoucher').textContent=`Diskon ${v.diskon}%`;
+  alert('Voucher diterapkan');
+};
 
-    // init all
-    showPage('produk');renderProduk();renderKeranjang();renderWishlist();renderRiwayat();renderVoucher();updateDashboard();
-  });
+// Checkout & Cetak
+window.checkoutWA = () => {
+  let cart=[...keranjang];
+  if(appliedDisc) cart=cart.map(p=>({...p,harga:Math.round(p.harga*(100-appliedDisc)/100)}));
+  const teks=cart.map(p=>`${p.nama} - Rp${p.harga}`).join('\n');
+  window.open(`https://wa.me/6283131810087?text=${encodeURIComponent(teks)}`);
+  riwayat.push(...cart);
+  localStorage.setItem('riwayat', JSON.stringify(riwayat));
+  keranjang=[]; localStorage.setItem('keranjang','[]');
+  renderKeranjang(); appliedDisc=0;
+};
+
+window.cetakPDF = (() => {
+  const { jsPDF } = window.jspdf;
+  return () => {
+    const doc = new jsPDF();
+    keranjang.forEach((p,i)=>doc.text(`${p.nama} - Rp${p.harga}`,10,10+i*10));
+    doc.save('struk.pdf');
+  };
 })();
+
+// Dashboard & Pengaturan
+function updateDashboard() {
+  document.getElementById('jumlahProduk').textContent = produkContainer.children.length;
+  const total=riwayat.reduce((a,p)=>a+p.harga,0);
+  document.getElementById('totalOmzet').textContent=`Rp${total}`;
+}
+window.editLogin = () => {
+  if(!userLogin) return alert('Login dulu');
+  loginData[userLogin]={user:document.getElementById('editUsername').value,
+                       pass:document.getElementById('editPassword').value};
+  alert('Login diperbarui');
+};
+
+// Search filter
+searchInput.addEventListener('input', () => {
+  const q=searchInput.value.toLowerCase();
+  document.querySelectorAll('.produk-card').forEach(c=>{
+    c.style.display=c.querySelector('h3').textContent.toLowerCase().includes(q)?'block':'none';
+  });
+});
