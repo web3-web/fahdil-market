@@ -1,135 +1,142 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>FAHDiL Market</title>
-  <link rel="stylesheet" href="style.css">
-  <script defer src="script.js"></script>
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <link rel="stylesheet" href="style.css" />
+  <!-- Supabase SDK -->
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+    window.SUPA = createClient(
+      'https://oyytfanprhcayxthzrbq.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im95eXRmYW5wcmhjYXl4dGh6cmJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE4NjUxNDEsImV4cCI6MjA2NzQ0MTE0MX0.CPfeVbV2BTP5dYt42yeoxX6XxQ0ezHtFJhKHZ1cY98k'
+    );
+  </script>
+  <!-- Main JS -->
+  <script src="script.js" defer></script>
 </head>
 <body>
-  <div id="app">
-    <nav class="sidebar" id="sidebar">
-      <h2>🛒 FAHDiL Market</h2>
-      <ul>
-        <li data-page="produk" onclick="showPage('produk')">🛍️ Daftar Produk</li>
-        <li data-page="tambah" onclick="showPage('tambah')">✏️ Tambah/Edit Produk</li>
-        <li data-page="keranjang" onclick="showPage('keranjang')">🛒 Keranjang</li>
-        <li data-page="checkout" onclick="showPage('checkout')">📦 Checkout</li>
-        <li data-page="riwayat" onclick="showPage('riwayat')">📜 Riwayat Pesanan</li>
-        <li data-page="struk" onclick="showPage('struk')">🧾 Cetak Struk</li>
-        <li data-page="dashboard" onclick="showPage('dashboard')">📊 Dashboard Admin</li>
-        <li data-page="voucher" onclick="showPage('voucher')">🎟️ Kode Voucher</li>
-        <li data-page="wishlist" onclick="showPage('wishlist')">❤️ Favorit</li>
-        <li data-page="pengaturan" onclick="showPage('pengaturan')">⚙️ Pengaturan</li>
-        <li data-page="login-pemilik" onclick="showPage('login-pemilik')">🔐 Login Pemilik</li>
-        <li data-page="login-owner" onclick="showPage('login-owner')">🗝️ Login Owner</li>
-        <li onclick="logout()">📤 Logout</li>
-      </ul>
-    </nav>
+  <nav id="sidebar" class="sidebar">
+    <h2>🛒 FAHDiL Market</h2>
+    <ul>
+      <li data-page="produk" onclick="showPage('produk')">🛍️ Produk</li>
+      <li data-page="tambah" onclick="showPage('tambah')">✏️ Tambah/Edit</li>
+      <li data-page="keranjang" onclick="showPage('keranjang')">🛒 Keranjang</li>
+      <li data-page="checkout" onclick="showPage('checkout')">📦 Checkout</li>
+      <li data-page="riwayat" onclick="showPage('riwayat')">📜 Riwayat</li>
+      <li data-page="struk" onclick="showPage('struk')">🧾 Struk</li>
+      <li data-page="dashboard" onclick="showPage('dashboard')">📊 Dashboard</li>
+      <li data-page="voucher" onclick="showPage('voucher')">🎟️ Voucher</li>
+      <li data-page="wishlist" onclick="showPage('wishlist')">❤️ Favorit</li>
+      <li data-page="pengaturan" onclick="showPage('pengaturan')">⚙️ Pengaturan</li>
+      <li data-page="login-pemilik" onclick="showPage('login-pemilik')">🔐 Login Pemilik</li>
+      <li data-page="login-owner" onclick="showPage('login-owner')">🗝️ Login Owner</li>
+      <li onclick="logout()">📤 Logout</li>
+    </ul>
+  </nav>
 
-    <header class="topbar">
-      <button id="toggleSidebar">☰</button>
-      <h1>🛍️ FAHDiL Market</h1>
-      <input type="text" id="searchInput" placeholder="🔍 Cari produk...">
-    </header>
+  <header class="topbar">
+    <button id="toggleSidebar">☰</button>
+    <h1>🛍️ FAHDiL Market</h1>
+    <input id="searchInput" type="text" placeholder="🔍 Cari produk..." />
+  </header>
 
-    <main>
-      <!-- Produk -->
-      <section id="produk" class="halaman active">
-        <h2>🛍️ Produk Tersedia</h2>
-        <div id="produkContainer"></div>
-      </section>
+  <main>
+    <!-- Produk -->
+    <section id="produk" class="halaman active">
+      <h2>🛍️ Daftar Produk</h2>
+      <div id="produkContainer"></div>
+    </section>
 
-      <!-- Tambah Produk -->
-      <section id="tambah" class="halaman">
-        <h2>✏️ Tambah Produk</h2>
-        <form id="formTambah">
-          <label>Nama:</label><input type="text" id="namaProduk" required>
-          <label>Harga:</label><input type="number" id="hargaProduk" required>
-          <label>Stok:</label><input type="number" id="stokProduk" required>
-          <label>Kategori:</label><input type="text" id="kategoriProduk" required>
-          <label>Gambar:</label><input type="file" id="gambarProduk" accept="image/*" required>
-          <button type="submit" class="btn warna-warni">💾 Simpan</button>
-        </form>
-      </section>
+    <!-- Tambah/Edit Produk -->
+    <section id="tambah" class="halaman">
+      <h2>✏️ Tambah/Edit Produk</h2>
+      <form id="formTambah">
+        <label>Nama</label><input id="namaProduk" type="text" required /><br>
+        <label>Harga</label><input id="hargaProduk" type="number" required /><br>
+        <label>Stok</label><input id="stokProduk" type="number" required /><br>
+        <label>Kategori</label><input id="kategoriProduk" type="text" required /><br>
+        <label>Gambar</label><input id="gambarProduk" type="file" accept="image/*" /><br>
+        <button type="submit" class="btn warna-warni">💾 Simpan</button>
+      </form>
+    </section>
 
-      <!-- Keranjang -->
-      <section id="keranjang" class="halaman">
-        <h2>🛒 Keranjang</h2>
-        <div id="keranjangContainer"></div>
-      </section>
+    <!-- Keranjang -->
+    <section id="keranjang" class="halaman">
+      <h2>🛒 Keranjang</h2>
+      <div id="keranjangContainer"></div>
+    </section>
 
-      <!-- Checkout -->
-      <section id="checkout" class="halaman">
-        <h2>📦 Checkout</h2>
-        <label>Voucher:</label>
-        <input id="applyVoucher" placeholder="Masukkan kode voucher">
-        <button class="btn warna-warni" onclick="applyVoucher()">Gunakan</button>
-        <p>Status Voucher: <span id="statusVoucher">Tidak Ada</span></p>
-        <button class="btn warna-warni" onclick="checkoutWA()">Kirim ke WhatsApp</button>
-      </section>
+    <!-- Checkout -->
+    <section id="checkout" class="halaman">
+      <h2>📦 Checkout</h2>
+      <label>Voucher</label>
+      <input id="applyVoucher" type="text" placeholder="Kode voucher" />
+      <button class="btn warna-warni" onclick="applyVoucher()">Gunakan</button>
+      <p>Status Voucher: <span id="statusVoucher">Tidak Ada</span></p>
+      <button class="btn warna-warni" onclick="checkoutWA()">Kirim ke WhatsApp</button>
+    </section>
 
-      <!-- Riwayat -->
-      <section id="riwayat" class="halaman">
-        <h2>📜 Riwayat Pesanan</h2>
-        <div id="riwayatContainer"></div>
-      </section>
+    <!-- Riwayat -->
+    <section id="riwayat" class="halaman">
+      <h2>📜 Riwayat Pesanan</h2>
+      <div id="riwayatContainer"></div>
+    </section>
 
-      <!-- Cetak Struk -->
-      <section id="struk" class="halaman">
-        <h2>🧾 Cetak Struk</h2>
-        <button class="btn warna-warni" onclick="cetakPDF()">Cetak PDF</button>
-      </section>
+    <!-- Cetak Struk -->
+    <section id="struk" class="halaman">
+      <h2>🧾 Cetak Struk</h2>
+      <button class="btn warna-warni" onclick="cetakPDF()">Cetak PDF</button>
+    </section>
 
-      <!-- Dashboard -->
-      <section id="dashboard" class="halaman">
-        <h2>📊 Dashboard Admin</h2>
-        <p>Jumlah Produk: <span id="jumlahProduk">0</span></p>
-      </section>
+    <!-- Dashboard -->
+    <section id="dashboard" class="halaman">
+      <h2>📊 Dashboard Admin</h2>
+      <p>Jumlah Produk: <span id="jumlahProduk">0</span></p>
+      <p>Total Omzet: <span id="totalOmzet">Rp0</span></p>
+    </section>
 
-      <!-- Voucher -->
-      <section id="voucher" class="halaman">
-        <h2>🎟️ Kode Voucher</h2>
-        <form id="formVoucher">
-          <label>Kode:</label><input id="kodeVoucher" required>
-          <label>Diskon (%):</label><input id="diskonVoucher" type="number" required>
-          <button type="submit" class="btn warna-warni">Simpan</button>
-        </form>
-        <div id="voucherList"></div>
-      </section>
+    <!-- Voucher -->
+    <section id="voucher" class="halaman">
+      <h2>🎟️ Kode Voucher</h2>
+      <form id="formVoucher">
+        <label>Kode</label><input id="kodeVoucher" type="text" required /><br>
+        <label>Diskon (%)</label><input id="diskonVoucher" type="number" required /><br>
+        <button type="submit" class="btn warna-warni">💾 Simpan</button>
+      </form>
+      <div id="voucherList"></div>
+    </section>
 
-      <!-- Favorit -->
-      <section id="wishlist" class="halaman">
-        <h2>❤️ Favorit</h2>
-        <div id="wishlistContainer"></div>
-      </section>
+    <!-- Favorit -->
+    <section id="wishlist" class="halaman">
+      <h2>❤️ Favorit</h2>
+      <div id="wishlistContainer"></div>
+    </section>
 
-      <!-- Pengaturan -->
-      <section id="pengaturan" class="halaman">
-        <h2>⚙️ Pengaturan</h2>
-        <label>Username Baru:</label><input id="editUsername">
-        <label>Password Baru:</label><input id="editPassword" type="password">
-        <button onclick="editLogin()" class="btn warna-warni">Simpan Perubahan</button>
-      </section>
+    <!-- Pengaturan -->
+    <section id="pengaturan" class="halaman">
+      <h2>⚙️ Pengaturan</h2>
+      <label>Username Baru</label><input id="editUsername" type="text" /><br>
+      <label>Password Baru</label><input id="editPassword" type="password" /><br>
+      <button onclick="editLogin()" class="btn warna-warni">💾 Simpan</button>
+    </section>
 
-      <!-- Login Pemilik -->
-      <section id="login-pemilik" class="halaman">
-        <h2>🔐 Login Pemilik</h2>
-        <input id="pemilikUser" placeholder="Username">
-        <input id="pemilikPass" type="password" placeholder="Password">
-        <button onclick="login('pemilik')" class="btn warna-warni">Login</button>
-      </section>
+    <!-- Login Pemilik -->
+    <section id="login-pemilik" class="halaman">
+      <h2>🔐 Login Pemilik</h2>
+      <input id="pemilikUser" type="text" placeholder="Username" /><br>
+      <input id="pemilikPass" type="password" placeholder="Password" /><br>
+      <button onclick="login('pemilik')" class="btn warna-warni">Login</button>
+    </section>
 
-      <!-- Login Owner -->
-      <section id="login-owner" class="halaman">
-        <h2>🗝️ Login Owner</h2>
-        <input id="ownerUser" placeholder="Username">
-        <input id="ownerPass" type="password" placeholder="Password">
-        <button onclick="login('owner')" class="btn warna-warni">Login</button>
-      </section>
-    </main>
-  </div>
+    <!-- Login Owner -->
+    <section id="login-owner" class="halaman">
+      <h2>🗝️ Login Owner</h2>
+      <input id="ownerUser" type="text" placeholder="Username" /><br>
+      <input id="ownerPass" type="password" placeholder="Password" /><br>
+      <button onclick="login('owner')" class="btn warna-warni">Login</button>
+    </section>
+  </main>
 </body>
 </html>
