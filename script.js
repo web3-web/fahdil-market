@@ -18,7 +18,7 @@ const loginData = {
   pemilik: { user: 'FAHDiL', pass: 'WEB_ADMIN_123' },
   owner:   { user: 'OWNERKU', pass: 'OWNER_PASS' }
 };
-let userLogin = null;
+let userLogin   = null;
 let appliedDisc = 0;
 
 // DOM elements
@@ -35,11 +35,11 @@ const isAdmin    = () => ['pemilik','owner'].includes(userLogin);
 function updateMenu() {
   document.querySelectorAll('nav#sidebar li[data-page]').forEach(li => {
     const page = li.getAttribute('data-page');
-    // show admin pages only for admin
     if (adminPages.includes(page)) {
+      // show only for admin
       li.style.display = isAdmin() ? 'block' : 'none';
     }
-    // hide login links when logged in
+    // hide login links once logged in
     if (page === 'login-pemilik' || page === 'login-owner') {
       li.style.display = isAdmin() ? 'none' : 'block';
     }
@@ -52,10 +52,17 @@ document.querySelectorAll('nav#sidebar li[data-page]').forEach(li =>
   li.addEventListener('click', () => sidebar.classList.remove('active'))
 );
 
-// ----- Page Navigation -----
+// ----- Page Navigation with Admin Guard -----
 window.showPage = id => {
+  // guard admin pages
+  if (adminPages.includes(id) && !isAdmin()) {
+    alert('Silakan login sebagai Pemilik/Owner terlebih dahulu.');
+    id = 'login-pemilik';
+  }
+
   document.querySelectorAll('.halaman').forEach(s => s.classList.remove('active'));
   document.getElementById(id)?.classList.add('active');
+
   if (id === 'produk') loadProduk();
 };
 
@@ -75,7 +82,7 @@ window.login = role => {
 };
 
 window.logout = () => {
-  userLogin = null;
+  userLogin   = null;
   appliedDisc = 0;
   alert('Logout berhasil');
   updateMenu();
@@ -100,24 +107,25 @@ async function loadProduk() {
       <button onclick="tambahWishlist(${p.id})" class="btn warna-warni">❤️</button>
     </div>
   `).join('');
-  searchInput.dispatchEvent(new Event('input')); // reapply search filter
+  // reapply search filter
+  searchInput.dispatchEvent(new Event('input'));
 }
 loadProduk();
 
 // ----- Prepare Edit Product -----
 window.prepareEdit = async id => {
   const { data: p } = await SUPA.from('produk').select('*').eq('id', id).single();
-  document.getElementById('namaProduk').value = p.nama;
-  document.getElementById('hargaProduk').value = p.harga;
-  document.getElementById('stokProduk').value = p.stok;
+  document.getElementById('namaProduk').value     = p.nama;
+  document.getElementById('hargaProduk').value    = p.harga;
+  document.getElementById('stokProduk').value     = p.stok;
   document.getElementById('kategoriProduk').value = p.kategori;
   showPage('tambah');
   document.getElementById('formTambah').onsubmit = async e => {
     e.preventDefault();
     await SUPA.from('produk').update({
-      nama: document.getElementById('namaProduk').value,
-      harga: +document.getElementById('hargaProduk').value,
-      stok: +document.getElementById('stokProduk').value,
+      nama:     document.getElementById('namaProduk').value,
+      harga:    +document.getElementById('hargaProduk').value,
+      stok:     +document.getElementById('stokProduk').value,
       kategori: document.getElementById('kategoriProduk').value
     }).eq('id', id);
     alert('Produk diperbarui');
@@ -144,8 +152,7 @@ function submitForm(e) {
   };
   if (file) reader.readAsDataURL(file);
 }
-const formTambah = document.getElementById('formTambah');
-formTambah.addEventListener('submit', submitForm);
+document.getElementById('formTambah').addEventListener('submit', submitForm);
 
 // ----- Keranjang -----
 window.tambahKeranjang = async id => {
