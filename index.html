@@ -1,4 +1,3 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -11,7 +10,7 @@
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
     window.SUPA = createClient(
       'https://oyytfanprhcayxthzrbq.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im95eXRmYW5wcmhjYXl4dGh6cmJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE4NjUxNDEsImV4cCI6MjA2NzQ0MTE0MX0.CPfeVbV2BTP5dYt42yeoxX6XxQ0ezHtFJhKHZ1cY98k'
+      'YOUR_ANON_KEY_HERE'
     );
   </script>
   <script src="script.js" defer></script>
@@ -21,19 +20,19 @@
   <nav id="sidebar" class="sidebar">
     <h2>🛒 FAHDiL Market</h2>
     <ul>
-      <li data-page="produk"        onclick="showPage('produk')">🛍️ Produk</li>
-      <li data-page="tambah"        onclick="showPage('tambah')">✏️ Tambah/Edit</li>
-      <li data-page="keranjang"     onclick="showPage('keranjang')">🛒 Keranjang</li>
-      <li data-page="checkout"      onclick="showPage('checkout')">📦 Checkout</li>
-      <li data-page="riwayat"       onclick="showPage('riwayat')">📜 Riwayat</li>
-      <li data-page="struk"         onclick="showPage('struk')">🧾 Struk</li>
-      <li data-page="dashboard"     onclick="showPage('dashboard')">📊 Dashboard</li>
-      <li data-page="voucher"       onclick="showPage('voucher')">🎟️ Voucher</li>
-      <li data-page="wishlist"      onclick="showPage('wishlist')">❤️ Favorit</li>
-      <li data-page="pengaturan"    onclick="showPage('pengaturan')">⚙️ Pengaturan</li>
-      <li data-page="konfirmasi"    onclick="showPage('konfirmasi')">✅ Konfirmasi</li>
+      <li data-page="produk" onclick="showPage('produk')">🛍️ Produk</li>
+      <li data-page="tambah" onclick="showPage('tambah')">✏️ Tambah/Edit</li>
+      <li data-page="keranjang" onclick="showPage('keranjang')">🛒 Keranjang</li>
+      <li data-page="checkout" onclick="showPage('checkout')">📦 Checkout</li>
+      <li data-page="riwayat" onclick="showPage('riwayat')">📜 Riwayat</li>
+      <li data-page="struk" onclick="showPage('struk')">🧾 Struk</li>
+      <li data-page="dashboard" onclick="showPage('dashboard')">📊 Dashboard</li>
+      <li data-page="voucher" onclick="showPage('voucher')">🎟️ Voucher</li>
+      <li data-page="wishlist" onclick="showPage('wishlist')">❤️ Favorit</li>
+      <li data-page="pengaturan" onclick="showPage('pengaturan')">⚙️ Pengaturan</li>
+      <li data-page="konfirmasi" onclick="showPage('konfirmasi')">✅ Konfirmasi</li>
       <li data-page="login-pemilik" onclick="showPage('login-pemilik')">🔐 Login Pemilik</li>
-      <li data-page="login-owner"   onclick="showPage('login-owner')">🗝️ Login Owner</li>
+      <li data-page="login-owner" onclick="showPage('login-owner')">🗝️ Login Owner</li>
       <li onclick="logout()">📤 Logout</li>
     </ul>
   </nav>
@@ -44,6 +43,14 @@
     <h1>🛍️ FAHDiL Market</h1>
     <input id="searchInput" type="text" placeholder="🔍 Cari produk..." />
   </header>
+
+  <!-- Banner Parallax -->
+  <section class="banner">
+    <div class="banner-overlay">
+      <h1 class="banner-text">Selamat Datang di FAHDiL Market</h1>
+      <a href="https://wa.me/6283131810087" class="btn banner-btn">💬 Chat Admin</a>
+    </div>
+  </section>
 
   <!-- Main Content -->
   <main>
@@ -57,11 +64,16 @@
     <section id="tambah" class="halaman">
       <h2>✏️ Tambah/Edit Produk</h2>
       <form id="formTambah">
-        <label>Nama</label><input id="namaProduk" type="text" required /><br>
-        <label>Harga</label><input id="hargaProduk" type="number" required /><br>
-        <label>Stok</label><input id="stokProduk" type="number" required /><br>
-        <label>Kategori</label><input id="kategoriProduk" type="text" required /><br>
-        <label>Gambar</label><input id="gambarProduk" type="file" accept="image/*" /><br>
+        <label>Nama</label>
+        <input id="namaProduk" type="text" required />
+        <label>Harga</label>
+        <input id="hargaProduk" type="number" required />
+        <label>Stok</label>
+        <input id="stokProduk" type="number" required />
+        <label>Kategori</label>
+        <input id="kategoriProduk" type="text" required />
+        <label>Gambar</label>
+        <input id="gambarProduk" type="file" accept="image/*" />
         <button type="submit" class="btn warna-warni">💾 Simpan</button>
       </form>
     </section>
@@ -75,30 +87,24 @@
     <!-- Checkout Manual -->
     <section id="checkout" class="halaman">
       <h2>💳 Pembayaran Manual</h2>
-      <p>Total yang harus dibayar:</p>
-      <h3 id="totalBayar">Rp0</h3>
-
-      <label>Pilih Metode Pembayaran:</label><br>
+      <p>Total yang harus dibayar: <span id="totalBayar">Rp0</span></p>
+      <label>Pilih Metode Pembayaran:</label>
       <select id="paymentMethod">
         <option value="Seabank">Seabank</option>
         <option value="DANA">DANA</option>
         <option value="OVO">OVO</option>
         <option value="GoPay">GoPay</option>
       </select>
-
       <div class="rekening-box">
         <ul>
-          <li>Seabank : <span id="seabank">901055356035</span> <button onclick="salin('seabank')">Salin</button></li>
-          <li>DANA     : <span id="dana">083131810087</span> <button onclick="salin('dana')">Salin</button></li>
-          <li>OVO      : <span id="ovo">083131810087</span> <button onclick="salin('ovo')">Salin</button></li>
-          <li>GoPay    : <span id="gopay">083131810087</span> <button onclick="salin('gopay')">Salin</button></li>
+          <li>Seabank: <span id="seabank">901055356035</span> <button onclick="salin('seabank')">Salin</button></li>
+          <li>DANA: <span id="dana">083131810087</span> <button onclick="salin('dana')">Salin</button></li>
+          <li>OVO: <span id="ovo">083131810087</span> <button onclick="salin('ovo')">Salin</button></li>
+          <li>GoPay: <span id="gopay">083131810087</span> <button onclick="salin('gopay')">Salin</button></li>
         </ul>
       </div>
-
-      <p>📩 Setelah transfer, siapkan konfirmasi:</p>
       <button class="btn warna-warni" onclick="updateCheckout()">Buat Pesan WA</button>
-      <br><br>
-      <a href="#" id="waCheckout" target="_blank" class="btn warna-warni">Konfirmasi via WhatsApp</a>
+      <a href="#" id="waCheckout" class="btn warna-warni" target="_blank">Konfirmasi via WhatsApp</a>
     </section>
 
     <!-- Riwayat -->
@@ -145,7 +151,7 @@
       <button onclick="editLogin()" class="btn warna-warni">💾 Simpan</button>
     </section>
 
-    <!-- Konfirmasi Manual (Admin Only) -->
+    <!-- Konfirmasi Manual -->
     <section id="konfirmasi" class="halaman">
       <h2>✅ Konfirmasi Pembayaran</h2>
       <div id="konfirmasiContainer"></div>
