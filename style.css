@@ -20,23 +20,27 @@ body {
   bottom: 0;
   background: #222;
   padding: 1rem;
-  transition: left 0.3s;
+  transition: left 0.3s ease;
   z-index: 1001;
 }
-.sidebar.active { left: 0; }
+.sidebar.active {
+  left: 0;
+}
 .sidebar h2 {
   color: #0ff;
   margin-bottom: 1rem;
   font-size: 1.2rem;
 }
-.sidebar ul { list-style: none; }
+.sidebar ul {
+  list-style: none;
+}
 .sidebar li {
   padding: 10px;
   background: #333;
   margin: 6px 0;
   border-radius: 4px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.2s ease;
 }
 .sidebar li:hover,
 .sidebar li.active {
@@ -75,7 +79,7 @@ body {
   border-radius: 4px;
   width: 180px;
   max-width: 40%;
-  transition: border 0.2s;
+  transition: border 0.2s ease;
 }
 .topbar input:focus {
   border: 2px solid #0ff;
@@ -86,8 +90,7 @@ body {
 .banner {
   position: relative;
   background-image: url('banner.jpg');
-  background-size: contain;
-  background-repeat: no-repeat;
+  background-size: cover;
   background-position: center;
   background-attachment: fixed;
   height: 200px;
@@ -97,7 +100,7 @@ body {
 .banner-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -111,7 +114,6 @@ body {
   text-shadow: 2px 2px 5px #000;
 }
 .banner-btn {
-  display: inline-block;
   margin-top: 12px;
   padding: 8px 20px;
   background: #00ffff;
@@ -119,26 +121,35 @@ body {
   font-weight: bold;
   border-radius: 4px;
   text-decoration: none;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-  transition: transform 0.2s;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s ease;
 }
-.banner-btn:hover { transform: translateY(-2px); }
+.banner-btn:hover {
+  transform: translateY(-2px);
+}
 
 /* Main Content */
 main {
   margin-top: 56px;
   padding: 1rem;
-  transition: margin-left 0.3s;
+  transition: margin-left 0.3s ease;
 }
-.sidebar.active ~ main { margin-left: 240px; }
-.halaman { display: none; padding-bottom: 2rem; }
-.halaman.active { display: block; }
+.sidebar.active ~ main {
+  margin-left: 240px;
+}
+.halaman {
+  display: none;
+  padding-bottom: 2rem;
+}
+.halaman.active {
+  display: block;
+}
 
-/* Section Titles */
+/* Section Headings */
 .halaman h2 {
   margin-bottom: 1rem;
-  border-bottom: 1px solid #444;
   padding-bottom: 0.5rem;
+  border-bottom: 1px solid #444;
   color: #0ff;
 }
 
@@ -150,19 +161,23 @@ form input[type="file"],
 form select {
   width: 100%;
   padding: 8px;
-  margin: 6px 0 12px 0;
+  margin: 6px 0 12px;
   border: 1px solid #444;
   border-radius: 4px;
   background: #222;
   color: #eee;
-  transition: border 0.2s;
+  transition: border 0.2s ease;
 }
 form input:focus,
 form select:focus {
   border: 2px solid #0ff;
   outline: none;
 }
-form label { display: block; margin-top: 8px; font-weight: bold; }
+form label {
+  display: block;
+  margin-top: 8px;
+  font-weight: bold;
+}
 
 /* Buttons */
 .btn {
@@ -171,76 +186,78 @@ form label { display: block; margin-top: 8px; font-weight: bold; }
   border-radius: 4px;
   font-weight: bold;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: opacity 0.2s ease;
   display: inline-block;
   margin-top: 6px;
 }
-.btn:hover { opacity: 0.8; }
-.warna-warni {
-  background: linear-gradient(45deg,#f0f,#0ff);
-  background-size:200% 200%;
-  animation: rainbow 3s infinite alternate;
+.btn:hover {
+  opacity: 0.8;
 }
-@keyframes rainbow { 0%{background-position:0 50%}100%{background-position:100% 50%} }
+.warna-warni {
+  background: linear-gradient(45deg, #f0f, #0ff);
+  background-size: 200% 200%;
+  animation: rainbow 3s ease infinite alternate;
+}
+@keyframes rainbow {
+  0% { background-position: 0 50%; }
+  100% { background-position: 100% 50%; }
+}
 
 /* Produk Card */
 .produk-card {
-  background:#333;
-  padding:1rem;
-  margin:1rem 0;
-  border-radius:8px;
-  text-align:center;
+  background: #333;
+  padding: 1rem;
+  margin: 1rem 0;
+  border-radius: 8px;
+  text-align: center;
 }
 .produk-card img {
-  width:100%;
-  max-height:140px;
-  object-fit:contain;
-  border-radius:4px;
-  margin-bottom:8px;
+  width: 100%;
+  max-height: 140px;
+  object-fit: contain;
+  border-radius: 4px;
+  margin-bottom: 8px;
 }
-.produk-card button { margin:4px; }
+.produk-card button {
+  margin: 4px;
+}
 
-/* Lists */
+/* Cart, Riwayat, Wishlist */
 #keranjangContainer div,
 #riwayatContainer div,
 #wishlistContainer div {
-  background:#222;
-  padding:8px;
-  margin:6px 0;
-  border-radius:4px;
+  background: #222;
+  padding: 8px;
+  margin: 6px 0;
+  border-radius: 4px;
 }
 
 /* Rekening List */
-.rekening-box ul { list-style:none; padding-left:0; }
-.rekening-box li { margin:6px 0; }
-.rekening-box button { margin-left:8px; }
-
-/* Konfirmasi */
-.konf-card {
-  background:#333;
-  padding:1rem;
-  margin:0.5rem 0;
-  border-radius:6px;
+.rekening-box ul {
+  list-style: none;
+  padding-left: 0;
 }
-.konf-card p { margin-bottom:6px; }
-.status-paid { color:#0f0; font-weight:bold; }
+.rekening-box li {
+  margin: 6px 0;
+}
+.rekening-box button {
+  margin-left: 8px;
+}
 
-
-/* Voucher Apply Styles */
+/* Voucher Apply */
 .apply-voucher {
   display: flex;
   align-items: center;
   gap: 8px;
   margin-top: 12px;
 }
-.apply-voucher input {
-  flex: 1;
+.apply-voucher input,
+.apply-voucher button {
   padding: 8px;
   border: 1px solid #444;
   border-radius: 4px;
   background: #222;
   color: #eee;
-  transition: border 0.2s;
 }
 .apply-voucher input:focus {
   border: 2px solid #0ff;
@@ -251,17 +268,30 @@ form label { display: block; margin-top: 8px; font-weight: bold; }
   color: #0ff;
   margin-left: 8px;
 }
-
-/* WA Checkout Link */
 #waCheckout {
   display: inline-block;
   margin-top: 6px;
 }
 
+/* Konfirmasi */
+.konf-card {
+  background: #333;
+  padding: 1rem;
+  margin: 0.5rem 0;
+  border-radius: 6px;
+}
+.konf-card p {
+  margin-bottom: 6px;
+}
+.status-paid {
+  color: #0f0;
+  font-weight: bold;
+}
+
 /* Responsive */
-@media(max-width:768px){
-  .topbar input { display:none; }
-  .sidebar { left:-260px; }
-  .sidebar.active { left:0; }
-  .sidebar.active ~ main { margin-left:0; }
+@media (max-width: 768px) {
+  .topbar input { display: none; }
+  .sidebar { left: -260px; }
+  .sidebar.active { left: 0; }
+  .sidebar.active ~ main { margin-left: 0; }
 }
