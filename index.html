@@ -1,3 +1,4 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -10,12 +11,13 @@
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
     window.SUPA = createClient(
       'https://oyytfanprhcayxthzrbq.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im95eXRmYW5wcmhjYXl4dGh6cmJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE4NjUxNDEsImV4cCI6MjA2NzQ0MTE0MX0.CPfeVbV2BTP5dYt42yeoxX6XxQ0ezHtFJhKHZ1cY98k'
+      'YOUR_ANON_KEY_HERE'
     );
   </script>
   <script src="script.js" defer></script>
 </head>
 <body>
+  <!-- Sidebar -->
   <nav id="sidebar" class="sidebar">
     <h2>🛒 FAHDiL Market</h2>
     <ul>
@@ -36,12 +38,14 @@
     </ul>
   </nav>
 
+  <!-- Topbar -->
   <header class="topbar">
     <button id="toggleSidebar">☰</button>
     <h1>🛍️ FAHDiL Market</h1>
     <input id="searchInput" type="text" placeholder="🔍 Cari produk..." />
   </header>
 
+  <!-- Main Content -->
   <main>
     <!-- Produk -->
     <section id="produk" class="halaman active">
@@ -74,17 +78,26 @@
       <p>Total yang harus dibayar:</p>
       <h3 id="totalBayar">Rp0</h3>
 
+      <label>Pilih Metode Pembayaran:</label><br>
+      <select id="paymentMethod">
+        <option value="Seabank">Seabank</option>
+        <option value="DANA">DANA</option>
+        <option value="OVO">OVO</option>
+        <option value="GoPay">GoPay</option>
+      </select>
+
       <div class="rekening-box">
-        <p><strong>Transfer ke:</strong></p>
-        <ul 
-          <li>Seabank : <span id="seabank">901055356035</span> <button onclick="salin('seabank')">Salin</button></li>
-          <li>DANA  : <span id="dana">083131810087</span> <button onclick="salin('dana')">Salin</button></li>
-          <li>OVO   : <span id="ovo">083131810087</span> <button onclick="salin('ovo')">Salin</button></li>
-          <li>GoPay : <span id="gopay">083131810087</span> <button onclick="salin('gopay')">Salin</button></li>
+        <ul>
+          <li>Seabank : <span id="seabank">123456789012345</span> <button onclick="salin('seabank')">Salin</button></li>
+          <li>DANA     : <span id="dana">083131810087</span> <button onclick="salin('dana')">Salin</button></li>
+          <li>OVO      : <span id="ovo">083131810087</span> <button onclick="salin('ovo')">Salin</button></li>
+          <li>GoPay    : <span id="gopay">083131810087</span> <button onclick="salin('gopay')">Salin</button></li>
         </ul>
       </div>
 
-      <p>📩 Setelah transfer, konfirmasi pembayaran:</p>
+      <p>📩 Setelah transfer, siapkan konfirmasi:</p>
+      <button class="btn warna-warni" onclick="updateCheckout()">Buat Pesan WA</button>
+      <br><br>
       <a href="#" id="waCheckout" target="_blank" class="btn warna-warni">Konfirmasi via WhatsApp</a>
     </section>
 
